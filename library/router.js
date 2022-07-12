@@ -29,7 +29,8 @@ class Router {
             req.body = await bodyParser(req);
         }
         const reqUrl = url.parse(req.url, true);
-        
+        req.url = reqUrl;
+
         if(req.method.toLowerCase() === this.router[index].method && reqUrl.pathname == this.router[index].uri){ 
             res.setHeader('Content-Type', 'application/json');
             if(index === this.router.length - 1){

@@ -3,6 +3,8 @@ const mongoose = require ('mongoose');
 
 async function getBooks(req, res, next) {
     try{
+        const { bookId, name, type, author, page, top } = req.url.query;
+
         const books = await Books.find();
         res.write(JSON.stringify(books));
         res.end();

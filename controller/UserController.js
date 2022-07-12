@@ -4,13 +4,36 @@ const delay = t => new Promise(resolve => setTimeout(resolve, t));
 
 async function getUsers(req, res, next) {
     try{
-        const users = await Users.find().populate(
-            {
-                path: 'cart',
-            }
-        );
-        res.write(JSON.stringify(users));
-        res.end();
+        const { userId, email, publicKey, page } = req.url.query;
+        if(userId){
+            const users = await Users.findById(new mongoose.Types.ObjectId(userId)).populate(
+                {
+                    path: 'cart',
+                }
+            );
+            res.write(JSON.stringify(users));
+            res.end();
+            return;
+        }
+        else if(email && publicKey) {
+            const users = await Users.find({ email: email, publicKey: publicKey}).populate(
+                {
+                    path: 'cart',
+                }
+            );
+            res.write(JSON.stringify(users));
+            res.end();
+            return;
+        }
+        else{
+            const users = await Users.find().populate(
+                {
+                    path: 'cart',
+                }
+            );
+            res.write(JSON.stringify(users));
+            res.end();
+        }
     }
     catch(err) {
         res.statusCode = 500;
