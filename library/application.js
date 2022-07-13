@@ -26,6 +26,11 @@ class Application {
 
     submit = async (req, res) => {
         this.index = 0;
+        if(req.method !== 'GET'){
+            req.body = await bodyParser(req);
+        }
+        const reqUrl = url.parse(req.url, true);
+        req.url = reqUrl;
         this.middlerware[0].action(req, res, this.next);
     }
 

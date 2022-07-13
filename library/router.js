@@ -25,31 +25,26 @@ class Router {
 
 
     callMiddleware = async (req, res, next, index) => {
-        if(req.method !== 'GET'){
-            req.body = await bodyParser(req);
-        }
-        const reqUrl = url.parse(req.url, true);
-        req.url = reqUrl;
-
-        if(req.method.toLowerCase() === this.router[index].method && reqUrl.pathname == this.router[index].uri){ 
+        
+        if(req.method.toLowerCase() === this.router[index].method &&  req.url.pathname === this.router[index].uri){ 
+            
             res.setHeader('Content-Type', 'application/json');
-            if(index === this.router.length - 1){
-                await this.router[index].action(req, res, next);
-            }
-            else {
-                await this.router[index].action(req, res, this.next);
-            }
+            await this.router[index].action(req, res, this.next);
 
         }
 
-        else this.next(req, res, next);
+        else {
+            this.next(req, res, next);
+            
+        }
     }
 
     next = (req, res, next) => {
-        if(this.index === this.router.length - 1) next(req, res, next);
-        if(this.index >= this.router.length - 1) return;
-        else this.callMiddleware(req, res, next, ++this.index);
-
+        if(this.index >= this.router.length - 1) next(req, res, next);
+        else {
+            this.callMiddleware(req, res, next, ++this.index);
+        
+        }
     }
 
     
