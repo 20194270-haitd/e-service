@@ -128,7 +128,7 @@ async function deleteBook(req, res, next) {
         }
 
         const books  = await Books.findByIdAndDelete( new mongoose.Types.ObjectId(bookId));
-        res.write(JSON.stringify(books));   
+        res.write(JSON.stringify(books));
         res.end();
     }
     catch(err) {

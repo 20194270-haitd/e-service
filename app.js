@@ -1,9 +1,15 @@
 require('dotenv').config();
+// const swaggerJsDoc = require("swagger-jsdoc");
+// const swaggerUI = require("swagger-ui-express");
+// const swaggerOptions = require('./swagger.json');
 const BookRoute = require('./router/BookRouter.js');
 const UserRoute = require('./router/UserRouter.js');
 
 const db = require('./config/connect');
 db.connect();
+
+// const specs = swaggerJsDoc(swaggerOptions);
+// app.use("/api-docs", swaggerUI.serve, swaggerUI.setup(specs));
 
 const app = require('./library/application');
 
