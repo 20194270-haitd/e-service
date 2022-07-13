@@ -18,6 +18,7 @@ async function login(req, res, next) {
                 res.write(JSON.stringify(
                     {
                         success: true,
+                        token: publicKey
                     }
                 ));
                 res.end();
