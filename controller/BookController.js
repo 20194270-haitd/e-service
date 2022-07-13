@@ -61,18 +61,28 @@ async function addBook(req, res, next) {
 async function updateBook(req, res, next) {
     try{
         const { body } = req;
-        
-        if(!await Books.findById(new mongoose.Types.ObjectId(body._id))){
+        const { bookId } = req.url.query;
+        if(body._id !== bookId){
             res.write(JSON.stringify(
                 {
-                    err: 'not exit',
-                    code: 300,
+                    err: 'Query id doesnt match body id',
+                    code: 400,
                 }
             ));
             res.end();
             return;
         }
-        await Books.findByIdAndUpdate(new mongoose.Types.ObjectId(body._id), body);
+        if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
+            res.write(JSON.stringify(
+                {
+                    err: 'not exit',
+                    code: 400,
+                }
+            ));
+            res.end();
+            return;
+        }
+        await Books.findByIdAndUpdate(new mongoose.Types.ObjectId(bookId), body);
         res.write(JSON.stringify(body));
         res.end();
     }
@@ -85,11 +95,11 @@ async function updateBook(req, res, next) {
 
 async function deleteBook(req, res, next) {
     try{
-        const { body } = req;
-        if(!await Books.findById(new mongoose.Types.ObjectId(body._id))){
+        const { bookId } = req.url.query;
+        if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
             res.write(JSON.stringify(
                 {
-                    err: 'not exit',
+                    err: 'Book does\'nt exit',
                     code: 300,
                 }
             ));
@@ -97,7 +107,7 @@ async function deleteBook(req, res, next) {
             return;
         }
 
-        const books  = await Books.findByIdAndDelete( new mongoose.Types.ObjectId(body._id));
+        const books  = await Books.findByIdAndDelete( new mongoose.Types.ObjectId(bookId));
         res.write(JSON.stringify(books));   
         res.end();
     }

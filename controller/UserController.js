@@ -59,8 +59,18 @@ async function addUser(req, res, next) {
 async function updateUser(req, res, next) {
     try{
         const { body } = req;
-        
-        if(!await Users.findById(new mongoose.Types.ObjectId(body._id))){
+        const { userId } = req.url.query;
+        if(body._id !== userId){
+            res.write(JSON.stringify(
+                {
+                    err: 'Query id doesnt match body id',
+                    code: 400,
+                }
+            ));
+            res.end();
+            return;
+        }
+        if(!await Users.findById(new mongoose.Types.ObjectId(userId))){
             res.write(JSON.stringify(
                 {
                     err: 'not exit',
@@ -70,7 +80,7 @@ async function updateUser(req, res, next) {
             res.end();
             return;
         }
-        await Users.findByIdAndUpdate(new mongoose.Types.ObjectId(body._id), body);
+        await Users.findByIdAndUpdate(new mongoose.Types.ObjectId(userId), body);
         res.write(JSON.stringify(body));
         res.end();
     }
@@ -84,7 +94,8 @@ async function updateUser(req, res, next) {
 async function deleteUser(req, res, next) {
     try{
         const { body } = req;
-        if(!await Users.findById(new mongoose.Types.ObjectId(body._id))){
+        const { userId } = req.url.query;
+        if(!await Users.findById(new mongoose.Types.ObjectId(userId))){
             res.write(JSON.stringify(
                 {
                     err: 'not exit',
