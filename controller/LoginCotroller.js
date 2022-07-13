@@ -7,6 +7,7 @@ async function login(req, res, next) {
         if(!(email && publicKey)) {
             res.write(JSON.stringify(
                 {
+                    success: false,
                     mes: 'Invalid input',
                 }
             ));
