@@ -3,7 +3,7 @@ const mongoose = require ('mongoose');
 
 async function getBooks(req, res, next) {
     try{
-        const { bookId, name, type, author, page, top } = req.url.query;
+        const { bookId, name, type, author, page, perPage , top } = req.url.query;
         if(bookId) {
             const books = await Books.findById(new mongoose.Types.ObjectId(bookId));
             res.write(JSON.stringify(books));
@@ -34,11 +34,24 @@ async function getBooks(req, res, next) {
             res.end();
             return;
         }
+        else if( page && perPage) {
+            const skip = (page - 1) * perPage;
+            if(skip >= 0){
+                const books = await Books.find().limit(perPage).skip();
+                res.write(JSON.stringify(books));
+                res.end();
+                return;
+            }
+            else throw({
+                err: 'page too small'
+            })
+        }
         const books = await Books.find();
         res.write(JSON.stringify(books));
         res.end();
     }
     catch(err) {
+        console.log(err);
         res.statusCode = 500;
         res.end(JSON.stringify(err));
     }

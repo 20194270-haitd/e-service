@@ -4,7 +4,7 @@ const delay = t => new Promise(resolve => setTimeout(resolve, t));
 
 async function getUsers(req, res, next) {
     try{
-        const { userId, email, publicKey, page } = req.url.query;
+        const { userId, email, publicKey, page, perPage } = req.url.query;
         if(userId){
             const users = await Users.findById(new mongoose.Types.ObjectId(userId)).populate(
                 {
@@ -24,6 +24,21 @@ async function getUsers(req, res, next) {
             res.write(JSON.stringify(users));
             res.end();
             return;
+        }
+        else if( page && perPage) {
+            const skip = (page - 1) * perPage;
+            if(skip >= 0){
+                const books = await Users.find().limit(perPage).skip().populate(
+                    {
+                        path: 'cart',
+                    });
+                res.write(JSON.stringify(books));
+                res.end();
+                return;
+            }
+            else throw({
+                err: 'page too small'
+            })
         }
         else{
             const users = await Users.find().populate(
