@@ -60,6 +60,16 @@ async function updateUser(req, res, next) {
     try{
         const { body } = req;
         const { userId } = req.url.query;
+        if(!userId) {
+            res.write(JSON.stringify(
+                {
+                    err: 'bad request',
+                    code: 400,
+                }
+            ));
+            res.end();
+            return;
+        }
         if(body._id !== userId){
             res.write(JSON.stringify(
                 {
@@ -95,6 +105,17 @@ async function deleteUser(req, res, next) {
     try{
         const { body } = req;
         const { userId } = req.url.query;
+        if(!userId) {
+            res.write(JSON.stringify(
+                {
+                    err: 'bad request',
+                    code: 400,
+                }
+            ));
+            res.end();
+            return;
+        }
+
         if(!await Users.findById(new mongoose.Types.ObjectId(userId))){
             res.write(JSON.stringify(
                 {
@@ -106,7 +127,7 @@ async function deleteUser(req, res, next) {
             return;
         }
 
-        await Users.findByIdAndDelete( new mongoose.Types.ObjectId(body._id));
+        await Users.findByIdAndDelete( new mongoose.Types.ObjectId(userId));
         res.write(JSON.stringify(
             {
                 mes: 'success',

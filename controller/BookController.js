@@ -62,6 +62,16 @@ async function updateBook(req, res, next) {
     try{
         const { body } = req;
         const { bookId } = req.url.query;
+        if(!bookId) {
+            res.write(JSON.stringify(
+                {
+                    err: 'bad request',
+                    code: 400,
+                }
+            ));
+            res.end();
+            return;
+        }
         if(body._id !== bookId){
             res.write(JSON.stringify(
                 {
@@ -96,6 +106,16 @@ async function updateBook(req, res, next) {
 async function deleteBook(req, res, next) {
     try{
         const { bookId } = req.url.query;
+        if(!bookId) {
+            res.write(JSON.stringify(
+                {
+                    err: 'bad request',
+                    code: 400,
+                }
+            ));
+            res.end();
+            return;
+        }
         if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
             res.write(JSON.stringify(
                 {
