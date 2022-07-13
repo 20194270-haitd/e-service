@@ -22,8 +22,8 @@ app.use(function(req, res, next) {
 
 // app.use(cors(corsOptions)) // Use this after the variable declaration
 
-app.addRoute(BookRoute);
 app.addRoute(UserRoute);
+app.addRoute(BookRoute);
 
 app.use(function errorHandler(req, res, next) {
     res.statusCode = 400;
