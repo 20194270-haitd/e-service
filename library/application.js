@@ -25,13 +25,21 @@ class Application {
     }
 
     submit = async (req, res) => {
-        this.index = 0;
-        if(req.method !== 'GET'){
-            req.body = await bodyParser(req);
+        try{
+            this.index = 0;
+            if(req.method !== 'GET'){
+                req.body = await bodyParser(req);
+            }
+            const reqUrl = url.parse(req.url, true);
+            req.url = reqUrl;
+            this.middlerware[0].action(req, res, this.next);
         }
-        const reqUrl = url.parse(req.url, true);
-        req.url = reqUrl;
-        this.middlerware[0].action(req, res, this.next);
+        catch(err) {
+            console.log(err);
+            res.statusCode = 500;
+            res.write(JSON.stringify(err));
+            res.end();
+        }
     }
 
     next = (req, res) => {

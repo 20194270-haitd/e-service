@@ -95,6 +95,7 @@ async function updateUser(req, res, next) {
         res.end();
     }
     catch(err) {
+        console.log(err);
         res.statusCode = 500;
         res.write(JSON.stringify(err));
         res.end();
@@ -136,6 +137,7 @@ async function deleteUser(req, res, next) {
         res.end();
     }
     catch(err) {
+        console.log(err);
         res.statusCode = 500;
         res.write(JSON.stringify(err));
         res.end();
