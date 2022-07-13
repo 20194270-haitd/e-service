@@ -1,4 +1,4 @@
-require("dotenv").config();
+require('dotenv').config();
 const BookRoute = require('./router/BookRouter.js');
 const UserRoute = require('./router/UserRouter.js');
 
@@ -6,6 +6,12 @@ const db = require('./config/connect');
 db.connect();
 
 const app = require('./library/application');
+
+app.use(function(req, res, next) {
+    res.setHeader('Access-Control-Allow-Origin', '*');
+    res.setHeader('Access-Control-Allow-Headers', 'Origin, X-Requested-With, Content-Type, Accept');
+    next(req, res, next);
+});
 
 app.addRoute(BookRoute);
 app.addRoute(UserRoute);
