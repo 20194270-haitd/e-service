@@ -57,6 +57,36 @@ async function getUsers(req, res, next) {
     }
 }
 
+async function getUsersByEmail(req, res, next) {
+    try{
+        const { email } = req.url.query;
+        if(email){
+            const user = await Users.findOne({email: email}, { publicKey: 0 }).populate(
+                {
+                    path: 'cart',
+                }
+            );
+            res.write(JSON.stringify(user));
+            res.end();
+        }
+        else {
+            res.write(JSON.stringify(
+                {
+                    err: 'bad request',
+                    code: 400,
+                }
+            ));
+            res.end();
+        }
+       
+    }
+    catch(err) {
+        res.statusCode = 500;
+        res.write(JSON.stringify(err));
+        res.end();
+    }
+}
+
 async function addUser(req, res, next) {
     try{
         const newUser = req.body;
@@ -164,6 +194,7 @@ async function deleteUser(req, res, next) {
 
 module.exports = {
     getUsers,
+    getUsersByEmail,
     addUser,
     updateUser,
     deleteUser
