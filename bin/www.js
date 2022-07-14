@@ -3,7 +3,6 @@ const app = require('../app.js')
 
 
 var port = normalizePort(process.env.PORT || '3000');
-//var port = normalizePort('3000');
 const server = http.createServer(app);
 
 server.listen(port);

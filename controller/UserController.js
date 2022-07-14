@@ -6,7 +6,7 @@ async function getUsers(req, res, next) {
     try{
         const { userId, email, page, perPage } = req.url.query;
         if(userId){
-            const users = await Users.findById(new mongoose.Types.ObjectId(userId)).populate(
+            const users = await Users.findById(new mongoose.Types.ObjectId(userId), { publicKey: 0 }).populate(
                 {
                     path: 'cart',
                 }
@@ -16,7 +16,7 @@ async function getUsers(req, res, next) {
             return;
         }
         else if(email) {
-            const users = await Users.find({ email: email}).populate(
+            const users = await Users.find({ email: email}, { publicKey: 0 }).populate(
                 {
                     path: 'cart',
                 }
@@ -28,7 +28,7 @@ async function getUsers(req, res, next) {
         else if( page && perPage) {
             const skip = (page - 1) * perPage;
             if(skip >= 0){
-                const books = await Users.find().limit(perPage).skip().populate(
+                const books = await Users.find({}, { publicKey: 0 }).limit(perPage).skip().populate(
                     {
                         path: 'cart',
                     });
@@ -41,7 +41,7 @@ async function getUsers(req, res, next) {
             })
         }
         else{
-            const users = await Users.find().populate(
+            const users = await Users.find({}, { publicKey: 0 }).populate(
                 {
                     path: 'cart',
                 }

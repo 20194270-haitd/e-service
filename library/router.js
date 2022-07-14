@@ -23,7 +23,6 @@ class Router {
     
     }
 
-
     callMiddleware = async (req, res, next, index) => {
         
         if(req.method.toLowerCase() === this.router[index].method &&  req.url.pathname === this.router[index].uri){ 

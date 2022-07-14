@@ -2,14 +2,12 @@ require('dotenv').config();
 const BookRoute = require('./router/BookRouter.js');
 const UserRoute = require('./router/UserRouter.js');
 const LoginRoute = require('./router/LoginRouter.js');
-
 const db = require('./config/connect');
-db.connect();
-
 const app = require('./library/application');
-
 const cors = require('./library/cors.js');
+
 app.use(cors());
+db.connect();
 
 app.addRoute(LoginRoute);
 app.addRoute(BookRoute);
