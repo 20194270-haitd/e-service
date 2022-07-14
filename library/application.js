@@ -27,7 +27,7 @@ class Application {
     submit = async (req, res) => {
         try{
             this.index = 0;
-            if(req.method !== 'GET'){
+            if(req.method !== 'GET' && req.method !== 'OPTIONS'){
                 req.body = await bodyParser(req);
             }
             const reqUrl = url.parse(req.url, true);
@@ -37,7 +37,6 @@ class Application {
         catch(err) {
             console.log(err);
             res.statusCode = 500;
-            res.write(JSON.stringify(err));
             res.end();
         }
     }

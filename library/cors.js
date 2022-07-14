@@ -159,8 +159,9 @@
   function cors(options, req, res, next) {
     var headers = [],
       method = req.method && req.method.toUpperCase && req.method.toUpperCase();
-
+      
     if (method === 'OPTIONS') {
+      
       // preflight
       headers.push(configureOrigin(options, req));
       headers.push(configureCredentials(options, req));
@@ -169,15 +170,17 @@
       headers.push(configureMaxAge(options, req));
       headers.push(configureExposedHeaders(options, req));
       applyHeaders(headers, res);
-
+    
       if (options.preflightContinue) {
         next(req, res, next);
       } else {
         // Safari (and potentially other browsers) need content-length 0,
         //   for 204 or they just hang waiting for a body
+        
         res.statusCode = options.optionsSuccessStatus;
         res.setHeader('Content-Length', '0');
         res.end();
+
       }
     } else {
       // actual response

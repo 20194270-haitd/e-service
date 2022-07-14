@@ -8,11 +8,8 @@ db.connect();
 
 const app = require('./library/application');
 
-app.use(function(req, res, next) {
-    res.setHeader('Access-Control-Allow-Origin', '*');
-    res.setHeader('Access-Control-Allow-Credentials', 'true');
-    next(req, res, next);
-});
+const cors = require('./library/cors.js');
+app.use(cors());
 
 app.addRoute(LoginRoute);
 app.addRoute(BookRoute);
