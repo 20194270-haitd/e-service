@@ -3,8 +3,8 @@ const jwt = require('jsonwebtoken');
 verifyUser = (req, res, next) => {
     const { authorization } = req.headers;
     if( authorization ) {
-        
-        const token = authorization;
+
+        const token = authorization.split(' ')[1];
         const key = process.env.SECRET_USER_KEY_TOKEN;
         jwt.verify(token, key, (err, admin) => {
         if(err) {
@@ -38,7 +38,7 @@ verifyAdmin = (req, res, next) => {
     const { authorization } = req.headers;
     if( authorization ) {
         
-        const token = authorization;
+        const token = authorization.split(' ')[1];
         const key = process.env.SECRET_ADMIN_KEY_TOKEN;
         jwt.verify(token, key, (err, admin) => {
         if(err) {
@@ -72,7 +72,7 @@ verify = (req, res, next) => {
     const { authorization } = req.headers;
     if( authorization ) {
         
-        const token = authorization;
+        const token = authorization.split(' ')[1];
         jwt.verify(token, process.env.SECRET_ADMIN_KEY_TOKEN, (err, admin) => {
             if(err) {
                 jwt.verify(token, process.env.SECRET_USER_KEY_TOKEN, (err, user) => {
