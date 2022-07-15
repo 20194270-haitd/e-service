@@ -15,17 +15,17 @@ async function getBooks(req, res, next) {
             res.end();
         }
         else if(name) {
-            const books = await Books.find({ name: name});
+            const books = await Books.find({ name: { $regex: name,  $options: 'i' }});
             res.write(JSON.stringify(books));
             res.end();
         }
         else if(author) {
-            const books = await Books.find({ author: author});
+            const books = await Books.find({ author: { $regex: author,  $options: 'i' }});
             res.write(JSON.stringify(books));
             res.end();
         }
         else if(type) {
-            const books = await Books.find({ type: type});
+            const books = await Books.find({ type: { $regex: type,  $options: 'i' }});
             res.write(JSON.stringify(books));
             res.end();
         }
@@ -36,9 +36,16 @@ async function getBooks(req, res, next) {
                 res.write(JSON.stringify(books));
                 res.end();
             }
-            else throw({
-                err: 'Page too small'
-            })
+            else {
+                res.statusCode = 400;
+                res.write(JSON.stringify(
+                    {
+                        err: 'page too small'
+                    }
+                ));
+                res.end();
+            
+            }
         }
         else {
             const books = await Books.find();

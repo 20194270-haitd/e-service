@@ -15,7 +15,7 @@ async function getUsers(req, res, next) {
             res.end();
         }
         else if(email) {
-            const users = await Users.find({ email: email}, { publicKey: 0 }).populate(
+            const users = await Users.find({ email: { $regex: email,  $options: 'i' }}, { publicKey: 0 }).populate(
                 {
                     path: 'cart',
                 }
