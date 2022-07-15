@@ -8,31 +8,26 @@ async function getBooks(req, res, next) {
             const books = await Books.findById(new mongoose.Types.ObjectId(bookId));
             res.write(JSON.stringify(books));
             res.end();
-            return;
         }
         else if(top) {
             const books = await Books.find().limit(top);
             res.write(JSON.stringify(books));
             res.end();
-            return;
         }
         else if(name) {
             const books = await Books.find({ name: name});
             res.write(JSON.stringify(books));
             res.end();
-            return;
         }
         else if(author) {
             const books = await Books.find({ author: author});
             res.write(JSON.stringify(books));
             res.end();
-            return;
         }
         else if(type) {
             const books = await Books.find({ type: type});
             res.write(JSON.stringify(books));
             res.end();
-            return;
         }
         else if( page && perPage) {
             const skip = (page - 1) * perPage;
@@ -40,20 +35,23 @@ async function getBooks(req, res, next) {
                 const books = await Books.find().limit(perPage).skip();
                 res.write(JSON.stringify(books));
                 res.end();
-                return;
             }
             else throw({
-                err: 'page too small'
+                err: 'Page too small'
             })
         }
-        const books = await Books.find();
-        res.write(JSON.stringify(books));
-        res.end();
+        else {
+            const books = await Books.find();
+            res.write(JSON.stringify(books));
+            res.end();
+        }
     }
     catch(err) {
         console.log(err);
         res.statusCode = 500;
-        res.end(JSON.stringify(err));
+        res.write(JSON.stringify(err));
+        res.end();
+
     }
 }
 
@@ -76,38 +74,40 @@ async function updateBook(req, res, next) {
         const { body } = req;
         const { bookId } = req.url.query;
         if(!bookId) {
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
-                    err: 'bad request',
-                    code: 400,
+                    err: 'Bad request, doesnt have bookId',
                 }
             ));
             res.end();
             return;
         }
         if(body._id !== bookId){
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'Query id doesnt match body id',
-                    code: 400,
                 }
             ));
             res.end();
             return;
         }
         if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
-                    err: 'not exit',
-                    code: 400,
+                    err: 'Book doesnt exit',
                 }
             ));
             res.end();
             return;
         }
-        await Books.findByIdAndUpdate(new mongoose.Types.ObjectId(bookId), body);
-        res.write(JSON.stringify(body));
-        res.end();
+        else {
+            await Books.findByIdAndUpdate(new mongoose.Types.ObjectId(bookId), body);
+            res.write(JSON.stringify(body));
+            res.end();
+        }
     }
     catch(err) {
         console.log(err);
@@ -121,29 +121,30 @@ async function deleteBook(req, res, next) {
     try{
         const { bookId } = req.url.query;
         if(!bookId) {
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
-                    err: 'bad request',
-                    code: 400,
+                    err: 'Bad request, doesnt have bookId',
                 }
             ));
             res.end();
             return;
         }
-        if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
+        else if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'Book does\'nt exit',
-                    code: 300,
                 }
             ));
             res.end();
             return;
         }
-
-        const books  = await Books.findByIdAndDelete( new mongoose.Types.ObjectId(bookId));
-        res.write(JSON.stringify(books));
-        res.end();
+        else {
+            const books  = await Books.findByIdAndDelete( new mongoose.Types.ObjectId(bookId));
+            res.write(JSON.stringify(books));
+            res.end();
+        }
     }
     catch(err) {
         console.log(err);

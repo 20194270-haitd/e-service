@@ -40,7 +40,9 @@ async function loginUser(req, res, next) {
     catch(err) {
         console.log(err);
         res.statusCode = 500;
-        res.end(JSON.stringify(err));
+        res.write(JSON.stringify(err));
+        res.end();
+
     }
 }
 
@@ -81,7 +83,9 @@ async function loginAdmin(req, res, next) {
     catch(err) {
         console.log(err);
         res.statusCode = 500;
-        res.end(JSON.stringify(err));
+        res.write(JSON.stringify(err));
+        res.end();
+
     }
 }
 

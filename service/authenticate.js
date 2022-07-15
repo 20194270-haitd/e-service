@@ -111,7 +111,7 @@ verify = (req, res, next) => {
 
 function generateAccessTokenUser(user) {
     try {
-        return jwt.sign({ publicKey: user.publicKey, email: user.email }, process.env.SECRET_USER_KEY_TOKEN, { expiresIn: "15d" });
+        return jwt.sign({ publicKey: user.publicKey, email: user.email }, process.env.SECRET_USER_KEY_TOKEN, { expiresIn: "1d" });
     }
     catch (err) {
         console.log(err);
@@ -120,7 +120,7 @@ function generateAccessTokenUser(user) {
 
 function generateAccessTokenAdmin(admin) {
     try {
-        return jwt.sign({ publicKey: admin.publicKey, email: admin.email }, process.env.SECRET_ADMIN_KEY_TOKEN, { expiresIn: "15d" });
+        return jwt.sign({ publicKey: admin.publicKey, email: admin.email }, process.env.SECRET_ADMIN_KEY_TOKEN, { expiresIn: "1d" });
     }
     catch (err) {
         console.log(err);

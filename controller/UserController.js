@@ -13,7 +13,6 @@ async function getUsers(req, res, next) {
             );
             res.write(JSON.stringify(users));
             res.end();
-            return;
         }
         else if(email) {
             const users = await Users.find({ email: email}, { publicKey: 0 }).populate(
@@ -23,7 +22,6 @@ async function getUsers(req, res, next) {
             );
             res.write(JSON.stringify(users));
             res.end();
-            return;
         }
         else if( page && perPage) {
             const skip = (page - 1) * perPage;
@@ -34,7 +32,6 @@ async function getUsers(req, res, next) {
                     });
                 res.write(JSON.stringify(books));
                 res.end();
-                return;
             }
             else throw({
                 err: 'page too small'
@@ -51,6 +48,7 @@ async function getUsers(req, res, next) {
         }
     }
     catch(err) {
+        console.log(err);
         res.statusCode = 500;
         res.write(JSON.stringify(err));
         res.end();
@@ -70,10 +68,10 @@ async function getUsersByEmail(req, res, next) {
             res.end();
         }
         else {
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'bad request',
-                    code: 400,
                 }
             ));
             res.end();
@@ -81,6 +79,7 @@ async function getUsersByEmail(req, res, next) {
        
     }
     catch(err) {
+    rconsole.log(err);
         res.statusCode = 500;
         res.write(JSON.stringify(err));
         res.end();
@@ -90,11 +89,37 @@ async function getUsersByEmail(req, res, next) {
 async function addUser(req, res, next) {
     try{
         const newUser = req.body;
-        const user  = await Users.create(newUser);
-        res.write(JSON.stringify(user));
-        res.end();
+        if(newUser.email && newUser.publicKey){
+            const user = await Users.findOne({email: newUser.email});
+            if(user) {
+                res.statusCode = 400;
+                res.write(JSON.stringify(
+                    {
+                        mes: 'Email has exit'
+                    }
+                ));
+                res.end();
+            }
+            else {
+                const user  = await Users.create(newUser);
+                res.write(JSON.stringify(user));
+                res.end();
+            }
+        }
+        else {
+            res.statusCode = 400;
+            res.write(JSON.stringify(
+                {
+                    mes: 'Missing require infomation'
+                }
+            ));
+            res.end();
+        }
+
+        
     }
     catch(err) {
+        console.log(err);
         res.statusCode = 500;
         res.write(JSON.stringify(err));
         res.end();
@@ -106,38 +131,52 @@ async function updateUser(req, res, next) {
         const { body } = req;
         const { userId } = req.url.query;
         if(!userId) {
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'bad request',
-                    code: 400,
                 }
             ));
             res.end();
             return;
         }
-        if(body._id !== userId){
+        else if(body._id !== userId){
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'Query id doesnt match body id',
-                    code: 400,
                 }
             ));
             res.end();
             return;
         }
-        if(!await Users.findById(new mongoose.Types.ObjectId(userId))){
+        else if(!await Users.findById(new mongoose.Types.ObjectId(userId))){ 
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'not exit',
-                    code: 300,
                 }
             ));
             res.end();
             return;
         }
-        await Users.findByIdAndUpdate(new mongoose.Types.ObjectId(userId), body);
-        res.write(JSON.stringify(body));
-        res.end();
+        else{
+            const user = await Users.findOne({email: body.email});
+            if(user && user._id.toString() !== body._id)  {
+                res.statusCode = 400;
+                res.write(JSON.stringify(
+                    {
+                        mes: 'Email has been used by anoter user'
+                    }
+                ));
+                res.end();
+            }
+            else {
+                await Users.findByIdAndUpdate(new mongoose.Types.ObjectId(userId), body);
+                res.write(JSON.stringify(body));
+                res.end();
+            }
+        }
     }
     catch(err) {
         console.log(err);
@@ -149,37 +188,38 @@ async function updateUser(req, res, next) {
 
 async function deleteUser(req, res, next) {
     try{
-        const { body } = req;
         const { userId } = req.url.query;
         if(!userId) {
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'bad request',
-                    code: 400,
                 }
             ));
             res.end();
             return;
         }
 
-        if(!await Users.findById(new mongoose.Types.ObjectId(userId))){
+        else if(!await Users.findById(new mongoose.Types.ObjectId(userId))){
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     err: 'not exit',
-                    code: 300,
                 }
             ));
             res.end();
             return;
         }
 
-        await Users.findByIdAndDelete( new mongoose.Types.ObjectId(userId));
-        res.write(JSON.stringify(
-            {
-                mes: 'success',
-            }
-        ));   
-        res.end();
+        else {
+            await Users.findByIdAndDelete( new mongoose.Types.ObjectId(userId));
+            res.write(JSON.stringify(
+                {
+                    mes: 'success',
+                }
+            ));   
+            res.end();
+        }
     }
     catch(err) {
         console.log(err);
