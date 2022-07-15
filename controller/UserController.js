@@ -33,9 +33,17 @@ async function getUsers(req, res, next) {
                 res.write(JSON.stringify(books));
                 res.end();
             }
-            else throw({
-                err: 'page too small'
-            })
+            else {
+                res.statusCode = 400;
+                res.write(JSON.stringify(
+                    {
+
+                        err: 'page too small'
+                    }
+                ));
+                res.end();
+            
+            }
         }
         else{
             const users = await Users.find({}, { publicKey: 0 }).populate(

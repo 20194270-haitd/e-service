@@ -8,6 +8,7 @@ async function loginUser(req, res, next) {
     try{
         const { email, publicKey } = req.body;
         if(!(email && publicKey)) {
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     success: false,
@@ -28,14 +29,16 @@ async function loginUser(req, res, next) {
                 res.end();
             }
             else {
+                res.statusCode = 400;
                 res.write(JSON.stringify(
                     {
                         success: false,
+                        mes: 'Admin doesnt exit',
                     }
                 ));
                 res.end();
             }
-        }
+        }x
     }
     catch(err) {
         console.log(err);
@@ -51,6 +54,7 @@ async function loginAdmin(req, res, next) {
     try{
         const { email, publicKey } = req.body;
         if(!(email && publicKey)) {
+            res.statusCode = 400;
             res.write(JSON.stringify(
                 {
                     success: false,
@@ -71,9 +75,11 @@ async function loginAdmin(req, res, next) {
                 res.end();
             }
             else {
+                res.statusCode = 400;
                 res.write(JSON.stringify(
                     {
                         success: false,
+                        mes: 'Admin doesnt exit',
                     }
                 ));
                 res.end();
