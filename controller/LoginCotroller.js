@@ -33,12 +33,12 @@ async function loginUser(req, res, next) {
                 res.write(JSON.stringify(
                     {
                         success: false,
-                        mes: 'Admin doesnt exit',
+                        mes: 'User doesnt exit',
                     }
                 ));
                 res.end();
             }
-        }x
+        }
     }
     catch(err) {
         console.log(err);
