@@ -1,10 +1,10 @@
 const Route = require('../library/router');
 const userController = require('../controller/UserController');
-const { verifyUser, verifyAdmin, verify } = require('../service/authenticate.js');
+const { verifyUser, verifyAdmin } = require('../service/authenticate.js');
 const route = new Route();
 
 
-route.use('/api/v1/users/by-email', 'get', verify, userController.getUsersByEmail);
+route.use('/api/v1/users/by-email', 'get', verifyUser, userController.getUsersByEmail);
 route.use('/api/v1/users', 'get', verifyAdmin, userController.getUsers);
 route.use('/api/v1/users', 'post', userController.addUser);
 route.use('/api/v1/users', 'put', verifyUser, userController.updateUser);

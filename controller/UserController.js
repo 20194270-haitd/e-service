@@ -66,16 +66,7 @@ async function getUsers(req, res, next) {
 async function getUsersByEmail(req, res, next) {
     try{
         const { email } = req.url.query;
-        if(email){
-            const user = await Users.findOne({email: email}, { publicKey: 0 }).populate(
-                {
-                    path: 'cart',
-                }
-            );
-            res.write(JSON.stringify(user));
-            res.end();
-        }
-        else {
+        if(!email) {
             res.statusCode = 400;
             res.write(JSON.stringify(
                 {
@@ -84,10 +75,30 @@ async function getUsersByEmail(req, res, next) {
             ));
             res.end();
         }
-       
+        else{
+            if(req.tokenUser.email !== email) {
+                
+                res.statusCode = 403;
+                res.write(JSON.stringify(
+                    {
+                        err: 'You dont have permited',
+                    }
+                ));
+                res.end();
+            }
+            else {
+                const user = await Users.findOne({email: email}, { publicKey: 0 }).populate(   
+                    {
+                        path: 'cart',
+                    }
+                );
+                res.write(JSON.stringify(user));
+                res.end();
+            }
+        }
     }
     catch(err) {
-    rconsole.log(err);
+        console.log(err);
         res.statusCode = 500;
         res.write(JSON.stringify(err));
         res.end();
@@ -138,7 +149,7 @@ async function updateUser(req, res, next) {
     try{
         const { body } = req;
         const { userId } = req.url.query;
-        if(!userId) {
+        if(!userId || !body.email || !body._id) {
             res.statusCode = 400;
             res.write(JSON.stringify(
                 {
@@ -146,7 +157,6 @@ async function updateUser(req, res, next) {
                 }
             ));
             res.end();
-            return;
         }
         else if(body._id !== userId){
             res.statusCode = 400;
@@ -156,8 +166,17 @@ async function updateUser(req, res, next) {
                 }
             ));
             res.end();
-            return;
         }
+        else if(req.tokenUser.email !== body.email){
+            res.statusCode = 403;
+                res.write(JSON.stringify(
+                    {
+                        err: 'You dont have permited',
+                    }
+                ));
+                res.end();
+        }
+
         else if(!await Users.findById(new mongoose.Types.ObjectId(userId))){ 
             res.statusCode = 400;
             res.write(JSON.stringify(
@@ -166,7 +185,6 @@ async function updateUser(req, res, next) {
                 }
             ));
             res.end();
-            return;
         }
         else{
             const user = await Users.findOne({email: body.email});

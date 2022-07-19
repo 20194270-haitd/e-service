@@ -88,9 +88,8 @@ async function updateBook(req, res, next) {
                 }
             ));
             res.end();
-            return;
         }
-        if(body._id !== bookId){
+        else if(body._id !== bookId){
             res.statusCode = 400;
             res.write(JSON.stringify(
                 {
@@ -98,9 +97,8 @@ async function updateBook(req, res, next) {
                 }
             ));
             res.end();
-            return;
         }
-        if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
+        else if(!await Books.findById(new mongoose.Types.ObjectId(bookId))){
             res.statusCode = 400;
             res.write(JSON.stringify(
                 {
@@ -108,7 +106,6 @@ async function updateBook(req, res, next) {
                 }
             ));
             res.end();
-            return;
         }
         else {
             await Books.findByIdAndUpdate(new mongoose.Types.ObjectId(bookId), body);

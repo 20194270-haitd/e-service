@@ -1,26 +1,44 @@
 const jwt = require('jsonwebtoken');
 
+const validTokens = [];  
+
 verifyUser = (req, res, next) => {
     const { authorization } = req.headers;
     if( authorization ) {
-
         const token = authorization.split(' ')[1];
-        const key = process.env.SECRET_USER_KEY_TOKEN;
-        jwt.verify(token, key, (err, admin) => {
-        if(err) {
+        if(validTokens.indexOf(token) === -1){
             res.status = 403;
-            res.write(JSON.stringify(
-                {
-                    mes: 'Token Inavlid'
-                }
+            res.write(JSON.stringify
+                (
+                    {
+                        mes: 'Token Inavlid'
+                    }
+                )
             )
-        )
-        res.end();
-            }
-            else {
-                next(req, res, next);
-            }
-        })
+            res.end();
+
+        } 
+        else {
+           
+            const key = process.env.SECRET_USER_KEY_TOKEN;
+            jwt.verify(token, key, (err, user) => {
+                if(err) {
+                    
+                    res.status = 403;
+                    res.write(JSON.stringify(
+                            {
+                                mes: 'Token Inavlid'
+                            }
+                        )
+                    )
+                    res.end();
+                }
+                else {
+                    req.tokenUser = user; 
+                    next(req, res, next);
+                }
+            })
+        }
     }
     else {
         res.status = 403;
@@ -39,22 +57,38 @@ verifyAdmin = (req, res, next) => {
     if( authorization ) {
         
         const token = authorization.split(' ')[1];
-        const key = process.env.SECRET_ADMIN_KEY_TOKEN;
-        jwt.verify(token, key, (err, admin) => {
-        if(err) {
+        if(validTokens.indexOf(token) === -1){
             res.status = 403;
-            res.write(JSON.stringify(
-                {
-                    mes: 'Token Inavlid'
-                }
+            res.write(JSON.stringify
+                (
+                    {
+                        mes: 'Token Inavlid'
+                    }
+                )
             )
-        )
-        res.end();
-            }
-            else {
-                next(req, res, next);
-            }
-        })
+            res.end();
+
+        }
+        else {
+            const key = process.env.SECRET_ADMIN_KEY_TOKEN;
+            jwt.verify(token, key, (err, admin) => {
+                if(err) {
+                    res.status = 403;
+                    res.write(JSON.stringify(
+                            {
+                                mes: 'Token Inavlid'
+                            }
+                        )
+                    )
+                    res.end();
+                }
+                
+                else {
+                    req.tokenAdmin = admin; 
+                    next(req, res, next);
+                }
+            })
+        }
     }
     else {
         res.status = 403;
@@ -73,29 +107,45 @@ verify = (req, res, next) => {
     if( authorization ) {
         
         const token = authorization.split(' ')[1];
-        jwt.verify(token, process.env.SECRET_ADMIN_KEY_TOKEN, (err, admin) => {
-            if(err) {
-                jwt.verify(token, process.env.SECRET_USER_KEY_TOKEN, (err, user) => {
-                    if(err){
-                        res.status = 403;
-                        res.write(JSON.stringify
-                            (
-                                {
-                                    mes: 'Token Inavlid'
-                                }
+        if(validTokens.indexOf(token) === -1){
+            res.status = 403;
+            res.write(JSON.stringify
+                (
+                    {
+                        mes: 'Token Inavlid'
+                    }
+                )
+            )
+            res.end();
+
+        }
+        else {
+            jwt.verify(token, process.env.SECRET_ADMIN_KEY_TOKEN, (err, admin) => {
+                if(err) {
+                    jwt.verify(token, process.env.SECRET_USER_KEY_TOKEN, (err, user) => {
+                        if(err){
+                            res.status = 403;
+                            res.write(JSON.stringify
+                                (
+                                    {
+                                        mes: 'Token expired'
+                                    }
+                                )
                             )
-                        )
-                        res.end();
-                    }
-                    else {
-                        next(req, res, next);
-                    }
-                })
-            }
-            else {
-                next(req, res, next);
-            }
-        })
+                            res.end();
+                        }
+                        else {
+                            req.tokenUser = user; 
+                            next(req, res, next);
+                        }
+                    })
+                }
+                else {
+                    req.tokenAdmin = admin;
+                    next(req, res, next);
+                }
+            })
+        }
     }
     else {
         res.status = 403;
@@ -133,6 +183,7 @@ module.exports = {
     verifyAdmin,
     verifyUser,
     generateAccessTokenAdmin,
-    generateAccessTokenUser
+    generateAccessTokenUser,
+    validTokens
 
 };
